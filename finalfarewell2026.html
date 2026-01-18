@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farewell 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #d4c4b0 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Celebration Screen Styles */
+        .celebration-screen {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6b4423 0%, #b8956a 50%, #6b4423 100%);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .celebration-screen.hidden {
+            display: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f5e6d3;
+            animation: confetti-fall linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .celebration-content {
+            text-align: center;
+            z-index: 10;
+            animation: celebration-zoom 1s ease-out;
+        }
+
+        @keyframes celebration-zoom {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .celebration-emoji {
+            font-size: 6em;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .celebration-title {
+            font-size: 3em;
+            color: #f5e6d3;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-family: 'Brush Script MT', cursive;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .celebration-subtitle {
+            font-size: 1.5em;
+            color: #f9f5f0;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .celebration-btn {
+            background: #f5e6d3;
+            border: 3px solid #f9f5f0;
+            color: #6b4423;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .celebration-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .celebration-btn:active {
+            transform: scale(0.95);
+        }
+
+        .welcome-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .welcome-popup.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .welcome-content {
+            background: linear-gradient(135deg, #f5e6d3, #e8d4bc);
+            border-radius: 20px;
+            padding: 50px 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            border: 3px solid #b8956a;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .welcome-hearts {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: heartbeat 1.5s ease infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .welcome-name {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #6b4423;
+            margin-bottom: 20px;
+            font-family: 'Brush Script MT', cursive;
+        }
+
+        .welcome-message {
+            font-size: 1.3em;
+            color: #8b6f47;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .welcome-btn {
+            background: #b8956a;
+            border: 2px solid #8b6f47;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .welcome-btn:active {
+            transform: scale(0.95);
+            background: #8b6f47;
+        }
+
+        .boarding-pass {
+            background: linear-gradient(135deg, #f9f5f0, #f0e6d8);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin: 20px 0;
+            position: relative;
+            border: 2px solid #d4c4b0;
+        }
+
+        .boarding-pass::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 60px;
+            background: #e8d4bc;
+            border-right: 2px dashed #b8956a;
+        }
+
+        .pass-content {
+            padding: 30px 30px 30px 80px;
+            position: relative;
+        }
+
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border: 2px solid #b8956a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65em;
+            color: #8b6f47;
+            text-align: center;
+            padding: 5px;
+            font-weight: 600;
+        }
+
+        .stamp::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 30px;
+            height: 30px;
+            border-left: 2px solid #b8956a;
+            border-top: 2px solid #b8956a;
+            border-bottom: 2px solid #b8956a;
+            transform: rotate(15deg);
+        }
+
+        .title {
+            font-size: 2.5em;
+            color: #6b4423;
+            margin-bottom: 10px;
+            font-family: 'Brush Script MT', cursive;
+            font-weight: 400;
+        }
+
+        .destination-label {
+            font-size: 0.9em;
+            color: #8b6f47;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .destination {
+            font-size: 1.8em;
+            color: #6b4423;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .location-label {
+            font-size: 0.9em;
+            color: #8b6f47;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .location {
+            font-size: 1.1em;
+            color: #6b4423;
+            margin-bottom: 20px;
+        }
+
+        .compass {
+            font-size: 2em;
+            color: #b8956a;
+            margin: 20px 0;
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed #d4c4b0;
+        }
+
+        .detail-item {
+            flex: 1;
+        }
+
+        .detail-label {
+            font-size: 0.85em;
+            color: #8b6f47;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 1.1em;
+            color: #6b4423;
+            font-weight: 700;
+        }
+
+        .with-love {
+            text-align: right;
+            margin-top: 20px;
+            font-family: 'Brush Script MT', cursive;
+            font-size: 1.8em;
+            color: #8b6f47;
+        }
+
+        .plane-icon {
+            position: absolute;
+            top: 50%;
+            left: 45%;
+            font-size: 1.5em;
+            color: #b8956a;
+            opacity: 0.3;
+        }
+
+        .section {
+            background: white;
+            margin: 20px 0;
+            padding: 30px 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e8d4bc;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #6b4423;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Brush Script MT', cursive;
+        }
+
+        .message-card {
+            background: linear-gradient(135deg, #f9f5f0, #f0e6d8);
+            border-radius: 15px;
+            padding: 25px;
+            color: #6b4423;
+            line-height: 1.8;
+            font-size: 1.05em;
+            border: 2px solid #e8d4bc;
+            margin-bottom: 20px;
+        }
+
+        .memories-folders {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .folder-card {
+            background: linear-gradient(135deg, #f9f5f0, #f0e6d8);
+            border: 2px solid #d4c4b0;
+            border-radius: 15px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+            display: block;
+        }
+
+        .folder-card:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .folder-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            display: block;
+            filter: sepia(0.5);
+        }
+
+        .folder-name {
+            color: #6b4423;
+            font-weight: 700;
+            font-size: 1.05em;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .memories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .memory-card {
+            background: linear-gradient(135deg, #f9f5f0, #f0e6d8);
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 2px solid #d4c4b0;
+            transition: all 0.3s ease;
+        }
+
+        .memory-card:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .memory-icon {
+            font-size: 2.5em;
+            margin-bottom: 12px;
+            display: block;
+            filter: sepia(0.3);
+        }
+
+        .memory-title {
+            color: #6b4423;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .memory-desc {
+            color: #8b6f47;
+            font-size: 0.9em;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 25px;
+            color: #8b6f47;
+        }
+
+        .footer-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #6b4423;
+        }
+
+        /* Thank You Screen */
+        .thankyou-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6b4423 0%, #b8956a 50%, #6b4423 100%);
+            z-index: 2500;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .thankyou-screen.active {
+            display: flex;
+        }
+
+        .thankyou-content {
+            text-align: center;
+            z-index: 10;
+            animation: thankYouZoom 1s ease-out;
+        }
+
+        @keyframes thankYouZoom {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            50% { transform: scale(1.1) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .thankyou-emoji {
+            font-size: 6em;
+            margin-bottom: 20px;
+            animation: sparkle 2s ease infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .thankyou-title {
+            font-size: 3.5em;
+            color: #f5e6d3;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: 'Brush Script MT', cursive;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .thankyou-message {
+            font-size: 1.4em;
+            color: #f9f5f0;
+            margin-bottom: 15px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .thankyou-submessage {
+            font-size: 1.1em;
+            color: #e8d4bc;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        .heart-float {
+            position: absolute;
+            font-size: 2em;
+            animation: floatUp linear forwards;
+            opacity: 0.8;
+        }
+
+        @keyframes floatUp {
+            to {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .celebration-title { font-size: 2em; }
+            .celebration-emoji { font-size: 4em; }
+            .title { font-size: 2em; }
+            .destination { font-size: 1.5em; }
+            .memories-grid { grid-template-columns: 1fr; }
+            .memories-folders { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Celebration Screen -->
+    <div class="celebration-screen" id="celebrationScreen">
+        <div class="celebration-content">
+            <div class="celebration-emoji">🎓🎉</div>
+            <div class="celebration-title">Farewell 2026</div>
+            <div class="celebration-subtitle">A Journey to Remember</div>
+            <button class="celebration-btn" onclick="startCelebration()">Begin the Celebration</button>
+        </div>
+    </div>
+
+    <!-- Thank You Screen -->
+    <div class="thankyou-screen" id="thankyouScreen">
+        <div class="thankyou-content">
+            <div class="thankyou-emoji">🙏✨</div>
+            <div class="thankyou-title">Thank You!</div>
+            <div class="thankyou-message">For being part of this incredible journey</div>
+            <div class="thankyou-message">See you at the farewell! 💫</div>
+            <div class="thankyou-submessage">~ With love and gratitude ~</div>
+        </div>
+    </div>
+
+    <!-- Welcome Popup -->
+    <div class="welcome-popup" id="welcomePopup">
+        <div class="welcome-content">
+            <div class="welcome-hearts">❤️❤️</div>
+            <div class="welcome-name">YASH</div>
+            <div class="welcome-message">You are heartily invited!</div>
+            <button class="welcome-btn" onclick="closeWelcome()">Let's go through the memories</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="boarding-pass">
+            <div class="pass-content">
+                <div class="stamp">MEMORIES AWAIT</div>
+                <div class="plane-icon"></div>
+                <div class="title">Farewell 2026</div>
+                
+                <div class="destination-label">VENUE:</div>
+                <div class="destination">ASSEMBLY GROUND</div>
+                
+                <div class="location-label">LOCATION:</div>
+                <div class="location">Vichakshan Jain Vidyapeeth</div>
+                
+                <div class="compass"></div>
+                
+                <div class="details-row">
+                    <div class="detail-item">
+                        <div class="detail-label">Date:</div>
+                        <div class="detail-value">31 January 2026</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Time:</div>
+                        <div class="detail-value">3:30 PM</div>
+                    </div>
+                </div>
+                
+                <div class="with-love">with love</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Our Journey</div>
+            <div class="message-card">
+                From nervous freshers to confident graduates, we've traveled an incredible path together. Late-night study sessions, mess gossip, classroom laughter, and countless memories that will forever warm our hearts. This is our legacy, our bond that time can never break.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Memory Gallery</div>
+            <div class="memories-folders" id="memoriesFolders"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">What We Cherish</div>
+            <div class="memories-grid">
+                <div class="memory-card">
+                    <span class="memory-icon">🎭</span>
+                    <div class="memory-title">Friendships</div>
+                    <div class="memory-desc">Forever bonds</div>
+                </div>
+                <div class="memory-card">
+                    <span class="memory-icon">📚</span>
+                    <div class="memory-title">Knowledge</div>
+                    <div class="memory-desc">Wisdom gained</div>
+                </div>
+                <div class="memory-card">
+                    <span class="memory-icon">🏆</span>
+                    <div class="memory-title">Triumphs</div>
+                    <div class="memory-desc">Victories shared</div>
+                </div>
+                <div class="memory-card">
+                    <span class="memory-icon">😄</span>
+                    <div class="memory-title">Joy</div>
+                    <div class="memory-desc">Pure happiness</div>
+                </div>
+                <div class="memory-card">
+                    <span class="memory-icon">🎯</span>
+                    <div class="memory-title">Dreams</div>
+                    <div class="memory-desc">Future goals</div>
+                </div>
+                <div class="memory-card">
+                    <span class="memory-icon">💪</span>
+                    <div class="memory-title">Strength</div>
+                    <div class="memory-desc">Together always</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Class of 2026</div>
+            <div class="message-card">
+                As we close this beautiful chapter, remember that you carry within you the strength of every challenge overcome and the joy of every memory made. The world awaits your brilliance. Go forth and shine! This isn't goodbye—it's see you at the top! 🚀
+            </div>
+        </div>
+
+        <div class="footer" id="footer">
+            <div class="footer-text">Forever Class 12, 2026</div>
+            <div>Where memories become legends ✨</div>
+            <div style="margin-top: 30px; padding: 20px;">
+                <button class="celebration-btn" onclick="showThankYou()" style="background: #b8956a; border: 2px solid #8b6f47; color: white; padding: 15px 30px; border-radius: 50px; font-size: 1.1em; font-weight: 600; cursor: pointer;">
+                    🎉 Complete Journey
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create confetti animation
+        function createConfetti() {
+            const colors = ['#f5e6d3', '#e8d4bc', '#d4c4b0', '#b8956a', '#f9f5f0'];
+            const celebrationScreen = document.getElementById('celebrationScreen');
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                celebrationScreen.appendChild(confetti);
+            }
+        }
+
+        // Initialize confetti on page load
+        createConfetti();
+
+        function startCelebration() {
+            document.getElementById('celebrationScreen').classList.add('hidden');
+            document.getElementById('welcomePopup').classList.add('active');
+        }
+
+        function closeWelcome() {
+            document.getElementById('welcomePopup').classList.remove('active');
+        }
+
+        // Render memory folders with Google Drive links
+        function renderFolders() {
+            const folders = [
+                { 
+                    name: '🎉 Farewell Day', 
+                    link: 'https://drive.google.com/drive/folders/1h0Q9J64CQuckdAE8_tjXDxpS6AX7oXzp?usp=sharing'
+                },
+                { 
+                    name: '🏫 School Life', 
+                    link: 'https://drive.google.com/drive/folders/1otNqX9hK4La_xiZVsM5IJHLcynwsa4et?usp=sharing'
+                },
+                { 
+                    name: '👥 Friends Forever', 
+                    link: 'https://drive.google.com/drive/folders/1HrI5WY8iTsU44JMCB-xjylO4noRZz6Th?usp=sharing'
+                },
+                { 
+                    name: '🎭 Events & Trips', 
+                    link: 'https://drive.google.com/drive/folders/1YjIGclXbTeuJsUSQssUCPXuJnLF0ovLa?usp=sharing'
+                }
+            ];
+
+            const container = document.getElementById('memoriesFolders');
+            container.innerHTML = '';
+            
+            folders.forEach(folder => {
+                const folderCard = document.createElement('a');
+                folderCard.className = 'folder-card';
+                folderCard.href = folder.link;
+                folderCard.target = '_blank';
+                folderCard.innerHTML = `
+                    <span class="folder-icon">📁</span>
+                    <div class="folder-name">${folder.name}</div>
+                `;
+                container.appendChild(folderCard);
+            });
+        }
+
+        // Initialize folders on page load
+        renderFolders();
+
+        // Detect when user reaches the end of the page
+        let hasShownThankYou = false;
+
+        // Use Intersection Observer for better detection
+        const footer = document.getElementById('footer');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !hasShownThankYou) {
+                    hasShownThankYou = true;
+                    setTimeout(() => {
+                        showThankYou();
+                    }, 1000);
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        observer.observe(footer);
+
+        // Also keep scroll detection as backup
+        window.addEventListener('scroll', function() {
+            if (hasShownThankYou) return;
+
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = document.documentElement.clientHeight;
+
+            // Check if user has scrolled to near the bottom (within 50px)
+            if (scrollTop + clientHeight >= scrollHeight - 50) {
+                hasShownThankYou = true;
+                setTimeout(() => {
+                    showThankYou();
+                }, 500);
+            }
+        });
+
+        function showThankYou() {
+            const thankyouScreen = document.getElementById('thankyouScreen');
+            thankyouScreen.classList.add('active');
+            
+            // Create floating hearts
+            const hearts = ['❤️', '💛', '💚', '💙', '💜', '🧡'];
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-float';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                heart.style.animationDelay = Math.random() * 2 + 's';
+                thankyouScreen.appendChild(heart);
+            }
+        }
+    </script>
+</body>
+</html>
